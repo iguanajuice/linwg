@@ -8,9 +8,9 @@ Dependencies:
 * `ssh`
 * `qrencode` (*Optional.* For generating QR code images)
 
-1. Download the `linwg` script
-2. Make executable: `chmod +x ~/Downloads/linwg`
-3. Move it into your path: `sudo mv ~/Downloads/linwg /usr/local/bin`
+1. Download the `linwg` script: `wget https://raw.githubusercontent.com/iguanajuice/linwg/main/linwg`
+2. Make executable: `chmod +x linwg`
+3. Move it into your path: `sudo mv linwg /usr/local/bin`
 
 ## How-to:
 
