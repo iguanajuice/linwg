@@ -1,0 +1,104 @@
+#!/bin/sh -x
+
+if [ -z "$1" ]
+then
+    echo 'No IP address or config file given.'
+    exit 1
+fi
+
+if [ `id -u` -eq 0 ]
+then
+    echo 'Running this script as root is not recommended!'
+    exit 127
+fi
+
+test $XDG_CONFIG_HOME || export XDG_CONFIG_HOME=$HOME/.config # follow XDG basedir spec
+CONFIG=$XDG_CONFIG_HOME/linwg # where to write the config files
+mkdir -p $CONFIG 2>/dev/null
+cd $CONFIG
+
+if ! echo $1 | grep -q wg
+then
+    rm wg*.conf qr*.png 2>/dev/null
+
+    HOST_KEY=`wg genkey`
+    HOST_PUBKEY=`echo $HOST_KEY | wg pubkey`
+
+    echo "[Interface]
+Address = 10.13.13.1
+ListenPort = 51280
+PrivateKey = $HOST_KEY
+
+PreUp = sysctl -w net.ipv4.ip_forward=1
+
+PostUp = iptables -t nat -I POSTROUTING -s 10.13.13.0/24 -o eth0 -j SNAT --to-source $1
+PostDown = iptables -t nat -D POSTROUTING -s 10.13.13.0/24 -o eth0 -j SNAT --to-source $1
+" > wg0.conf
+
+    # Port forwarding: The example below fowards port 25565 to the fifth (wg5) client
+    echo "
+PostUp = iptables -t nat -A PREROUTING -p tcp --dport 25565 -i eth0 -j DNAT --to-destination=10.13.13.6
+PostDown = iptables -t nat -D PREROUTING -p tcp --dport 25565 -i eth0 -j DNAT --to-destination=10.13.13.6
+" >> wg0.conf
+
+    for i in 1 2 3 4 5 # number of client configs to generate
+    do
+        KEY=`wg genkey`
+        PSK=`wg genpsk`
+
+        echo "[Peer]
+PublicKey = `echo $KEY | wg pubkey`
+PresharedKey = $PSK
+AllowedIPs = 10.13.13.$(($i+1))" >> wg0.conf
+
+        echo "[Interface]
+Address = 10.13.13.$(($i+1))
+ListenPort = 51280
+PrivateKey = $KEY
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = $HOST_PUBKEY
+PresharedKey = $PSK
+Endpoint = $1:51280
+AllowedIPs = 0.0.0.0/0, ::/0
+PersistentKeepalive = 25" > wg$i.conf
+
+        command -v qrencode >/dev/null && qrencode -r wg$i.conf -o qr$i.png
+    done
+
+    [ $2 = 1 ] && exit
+
+    # automatically setup WireGuard on the server
+    ssh-keygen -R $1
+    scp -o StrictHostKeyChecking=no wg0.conf root@$1:~
+    ssh root@$1 'apt update && apt install wireguard-tools iptables -y; wg-quick down ./wg0.conf; wg-quick up ./wg0.conf'
+    exit 0
+fi
+
+if command -v sudo >/dev/null
+then SUDO=sudo
+elif command -v doas >/dev/null
+then SUDO=doas
+else
+    su-c(){
+        su -c "$@"
+    }
+    SUDO=su-c
+fi
+
+if command -v nmcli >/dev/null
+then
+    alias wgquickup='nmcli c i type wireguard file'
+    alias wgquickdown='echo Tunnel established using NetworkManager; please use NetworkManager to remove it.#'
+else
+    alias wgquickup='$SUDO wg-quick up'
+    alias wgquickdown='$SUDO wg-quick down'
+fi
+
+if ! ip l | grep -q wg.
+then
+    wgquickup ./$1.conf
+else
+    wgquickdown ./$1.conf
+fi
