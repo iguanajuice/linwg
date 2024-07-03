@@ -1,2 +1,32 @@
 # linwg
-Quickly create a self-hosted VPN
+A shell script for quickly and remotely setting up a WireGuard server and generating client configs.
+
+## Installation:
+
+Dependencies:
+* `wireguard-tools`
+* `ssh`
+* `qrencode` (*Optional.* For generating QR code images)
+
+1. Download the `linwg` script
+2. Make executable: `chmod +x ~/Downloads/linwg`
+3. Move it into your path: `sudo mv ~/Downloads/linwg /usr/local/bin`
+
+## How-to:
+
+You will need:
+* An account with a VPS provider (e.g. Linode)
+* An SSH public key
+
+*The following instructions will be for Linode specifically,
+but these steps can be adapted for other VPS providers.*
+
+1. Create a new Linode/instance
+2. Leave image as Debian 11
+3. Select your desired region
+4. Under "Linode Plan" select "Shared CPU" and "Nanode 1 GB"
+5. Under "SSH keys" check your SSH key. If none are listed, add your SSH public key.
+6. Scroll to the bottom and click "Create Linode"
+7. Wait for your Linode to fully boot
+8. Copy it's IPv4 address and run the command `linwg [IP_ADRESS_WITHOUT_BRACKETS]`
+9. To connect to the server, run `linwg wg1`
