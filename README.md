@@ -19,7 +19,7 @@ You will need:
 * An SSH public key
 
 *The following instructions will be for Linode specifically,
-but these steps can be adapted for other VPS providers.*
+but these steps can be adapted for other VPS providers:*
 
 1. Create a new Linode/instance
 2. Leave image as Debian
