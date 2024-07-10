@@ -81,10 +81,10 @@ then SUDO=sudo
 elif command -v doas >/dev/null
 then SUDO=doas
 else
-    su-c(){
+    suc() {
         su -c "$@"
     }
-    SUDO=su-c
+    SUDO=suc
 fi
 
 if command -v nmcli >/dev/null
