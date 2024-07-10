@@ -67,7 +67,7 @@ PersistentKeepalive = 25" > wg$i.conf
         command -v qrencode >/dev/null && qrencode -r wg$i.conf -o qr$i.png
     done
 
-    [ $2 = 1 ] && exit
+    test $2 && exit # only generate config files if second argument is specified
 
     # automatically setup WireGuard on the server
     ssh-keygen -R $1
