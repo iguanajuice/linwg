@@ -2,7 +2,7 @@
 
 if [ -z "$1" ]
 then
-    echo 'No IP address or config file given.'
+    echo 'No IP address or config file specified.'
     exit 1
 fi
 
