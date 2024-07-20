@@ -25,9 +25,10 @@ but these steps can be adapted for other VPS providers:*
 2. Leave image as Debian
 3. Select your desired region
 4. Under "Linode Plan" select "Shared CPU" and "Nanode 1 GB"
-5. Under "SSH keys" check your SSH key. If none are listed, add your SSH public key.
-6. Scroll to the bottom and click "Create Linode"
-7. Wait for your Linode to fully boot
-8. Copy it's IPv4 address and run the command `linwg [IP_ADRESS_WITHOUT_BRACKETS]`
-9. To connect to the server, run `linwg wg1`
-10. To disconnect, repeat the above command (if *not* using NetworkManager)
+5. Set a root password (*use your browser's password generator so it'll auto-complete next time*)
+6. Under "SSH keys" check your SSH key. If none are listed, add your SSH public key.
+7. Scroll to the bottom and click "Create Linode"
+8. Wait for your Linode to fully boot
+9. Copy it's IPv4 address and run the command `linwg [IP_ADRESS_WITHOUT_BRACKETS]`
+10. To connect to the server, run `linwg wg1`
+11. To disconnect, repeat the above command (if *not* using NetworkManager)
