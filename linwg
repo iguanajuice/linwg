@@ -73,7 +73,7 @@ PersistentKeepalive = 25" > wg$i.conf
     ssh-keygen -R $1
     scp -o StrictHostKeyChecking=no wg0.conf root@$1:~
     ssh root@$1 'apt update && apt install wireguard-tools iptables -y; wg-quick down ./wg0.conf; wg-quick up ./wg0.conf'
-    exit 0
+    exit
 fi
 
 if command -v sudo >/dev/null
